@@ -139,33 +139,8 @@ export function useItemArrayManager() {
         errorMessage = '';
         items = cloneItems(items);
 
-        if (item.maxStack <= 1) {
-            items.push({ ...item, uid: Utility.uid.generate() });
-            return verifyStackAndWeight(items, options) ? items : undefined;
-        }
-
-        let remainingQuantity = item.quantity;
-        for (let i = 0; i < items.length; i++) {
-            if (items[i].id !== item.id || items[i].quantity === item.maxStack) {
-                continue;
-            }
-
-            if (remainingQuantity <= 0) {
-                break;
-            }
-
-            const availableSpace = item.maxStack - items[i].quantity;
-            const quantityToAdd = Math.min(availableSpace, remainingQuantity);
-
-            items[i].quantity += quantityToAdd;
-            remainingQuantity -= quantityToAdd;
-        }
-
-        if (remainingQuantity <= 0) {
-            return verifyStackAndWeight(items, options) ? items : undefined;
-        }
-
-        return addNewItemStacks(items, item, remainingQuantity, options);
+        items.push({ ...item });
+        return verifyStackAndWeight(items, options) ? items : undefined;
     }
 
     function getByUid(uid: string, items: Readonly<Item[]>): Readonly<Item> | undefined {
