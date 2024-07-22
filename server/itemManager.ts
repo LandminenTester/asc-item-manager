@@ -8,7 +8,7 @@ import { ItemManagerConfig } from '../shared/config.js';
 import { BaseItem, DatabaseBaseItem } from '../shared/types.js';
 import { useItemManagerDatabase } from './database.js';
 
-const ItemIdsFilePath = './src/plugins/simple-item-manager/shared/ignoreItemIds.ts';
+const ItemIdsFilePath = './src/plugins/asc-item-manager/shared/ignoreItemIds.ts';
 const Rebar = useRebar();
 const db = Rebar.database.useDatabase();
 const managerDb = useItemManagerDatabase();
