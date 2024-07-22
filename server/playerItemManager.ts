@@ -60,7 +60,7 @@ export function usePlayerItemManager(player: alt.Player) {
      * @param {AddOptions} [addOptions={}] - Additional options for adding the item.
      * @returns {Promise<boolean>} A promise that resolves to `true` if the item was added successfully, otherwise `false`.
      */
-    async function addSpecificItem(item: Item, addOptions: AddOptions = {}) {
+    async function addSpecificItem(item: Item, addOptions: AddOptions = {}): Promise<boolean> {
         console.log(`Adding specific item: ${item.id}, Quantity: ${item.quantity}`);
         const data = document.get<InventoryExtension>();
         if (!data.items) {

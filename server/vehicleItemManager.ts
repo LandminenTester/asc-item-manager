@@ -47,7 +47,7 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
      * @param {AddOptions} [addOptions={}] - Additional options for adding the item.
      * @returns {Promise<boolean>} A promise that resolves to `true` if the item was added successfully, otherwise `false`.
      */
-    async function addSpecificItem(item: Item, addOptions: AddOptions = {}) {
+    async function addSpecificItem(item: Item, addOptions: AddOptions = {}): Promise<boolean> {
         const data = document.get<InventoryExtension>();
         if (!data.items) {
             data.items = [];
