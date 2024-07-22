@@ -7,11 +7,14 @@ export type InventoryExtension = {
     items?: Array<Item>;
 
     /**
-     * The maximum number of inventory slots the player has.
+     * The maximum number of inventory cells the player has.
      *
-     * @type {number}
+     * @type {{width: number, height: number}}
      */
-    maxSlots?: number;
+    maxCells?: {
+        width: number;
+        height: number;
+    };
 };
 
 export type Storage = {
@@ -67,6 +70,20 @@ export type BaseItem = {
      * @type {string}
      */
     desc: string;
+
+    /**
+     * The width and height of the item in cells
+     *
+     * @type {number}
+     */
+    width: number;
+
+    /**
+     * The width and height of the item in cells
+     *
+     * @type {number}
+     */
+    height: number;
 
     /**
      * The maximum amount of items that can exist in this stack of items
@@ -181,11 +198,14 @@ export type AddOptions = {
     maxWeight?: number;
 
     /**
-     * The max slots of an array of items can have
+     * The max cells of an array of items can have
      *
-     * @type {number}
+     * @type {{width: number, height: number}}
      */
-    maxSlots?: number;
+    maxCells?: {
+        width: number;
+        height: number;
+    };
 
     /**
      * Any unique data to be associated with the item

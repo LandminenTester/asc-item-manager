@@ -39,17 +39,23 @@ export function useItemArrayManager() {
      * @return
      */
     function verifyStackAndWeight(items: Item[], options: AddOptions = {}) {
-        if (!options.maxSlots) {
-            options.maxSlots = ItemManagerConfig.slots.maxSlots;
+        if (!options.maxCells) {
+            options.maxCells = ItemManagerConfig.slots.maxCells;
         }
 
         if (!options.maxWeight) {
             options.maxWeight = ItemManagerConfig.weight.maxWeight;
         }
 
-        // Perform final check on slot count
-        if ((ItemManagerConfig.slots.enabled && items.length >= options.maxSlots) || options.maxSlots <= 0) {
-            errorMessage = 'Exceeded available slot count';
+        // Calculate total cells occupied by all items
+        const totalCellsOccupied = items.reduce((sum, item) => sum + item.width * item.height, 0);
+
+        // Calculate total available cells
+        const totalAvailableCells = options.maxCells.width * options.maxCells.height;
+
+        // Perform final check on cell count
+        if ((ItemManagerConfig.slots.enabled && totalCellsOccupied > totalAvailableCells) || totalAvailableCells <= 0) {
+            errorMessage = 'Exceeded available cell count';
             return false;
         }
 
@@ -83,7 +89,7 @@ export function useItemArrayManager() {
         // Break any bindings
         items = Utility.clone.arrayData(items);
 
-        options.maxSlots = options.maxSlots || ItemManagerConfig.slots.maxSlots;
+        options.maxCells = options.maxCells || ItemManagerConfig.slots.maxCells;
         options.maxWeight = options.maxWeight || ItemManagerConfig.weight.maxWeight;
 
         // Handle Item Stacking
@@ -146,7 +152,7 @@ export function useItemArrayManager() {
         // Break any bindings
         items = Utility.clone.arrayData(items);
 
-        options.maxSlots = options.maxSlots || ItemManagerConfig.slots.maxSlots;
+        options.maxCells = options.maxCells || ItemManagerConfig.slots.maxCells;
         options.maxWeight = options.maxWeight || ItemManagerConfig.weight.maxWeight;
 
         // Handle Item Stacking

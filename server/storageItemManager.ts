@@ -27,8 +27,8 @@ const managerDb = useItemManagerDatabase();
 export async function useStorageItemManager(identifier: string, options: Omit<AddOptions, 'data'> = {}) {
     const itemArrayManager = useItemArrayManager();
 
-    if (!options.maxSlots) {
-        options.maxSlots = ItemManagerConfig.slots.maxSlots;
+    if (!options.maxCells) {
+        options.maxCells = ItemManagerConfig.slots.maxCells;
     }
 
     if (!options.maxWeight) {
@@ -40,7 +40,7 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
     let document = await db.get<Storage>({ id: identifier }, ItemManagerConfig.collectionNameForStorage);
     if (!document) {
         await db.create<Omit<Storage, '_id'>>(
-            { id: identifier, items: [], maxSlots: options.maxSlots, lastAccessed: Date.now() },
+            { id: identifier, items: [], maxCells: options.maxCells, lastAccessed: Date.now() },
             ItemManagerConfig.collectionNameForStorage,
         );
 

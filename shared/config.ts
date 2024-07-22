@@ -11,6 +11,9 @@ export const ItemManagerConfig = {
     // This can be modified when calling functions
     slots: {
         enabled: true,
-        maxSlots: 16,
+        maxCells: {
+            width: 5,
+            height: 5,
+        },
     },
 };
