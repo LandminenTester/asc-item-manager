@@ -37,7 +37,7 @@ async function init() {
         fs.writeFileSync(ItemIdsFilePath, fileContent);
     } catch (err) {
         alt.logWarning(
-            `If you renamed the folder 'simple-item-manager' please rename the plugin back to its original name`,
+            `If you renamed the folder 'asc-item-manager' please rename the plugin back to its original name`,
         );
     }
 
