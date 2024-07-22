@@ -52,20 +52,29 @@ export function useItemManager() {
      * @param {BaseItem} item
      */
     async function create(item: BaseItem) {
+        // Ensure weight is non-negative
         if (item.weight < 0) {
             item.weight = 0;
         }
 
+        // Ensure maxStack is at least 1
         if (item.maxStack <= 0) {
             item.maxStack = 1;
         }
 
+        // Wait until the system is ready
         await alt.Utils.waitFor(() => isReady, 60000 * 2);
-        if (databaseItems[item.id]) {
-            return;
-        }
 
-        await db.create(Utility.clone.objectData(item), ItemManagerConfig.collectionName);
+        const clonedItem: BaseItem = Utility.clone.objectData(item);
+
+        if (databaseItems[item.id]) {
+            const itemId = databaseItems[item.id]._id;
+            const updateData = { _id: itemId, ...clonedItem };
+            await db.update(updateData, ItemManagerConfig.collectionName);
+        } else {
+            await db.create(clonedItem, ItemManagerConfig.collectionName);
+            console.log('Item created:', item.id);
+        }
     }
 
     /**

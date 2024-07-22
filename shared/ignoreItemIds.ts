@@ -1,2 +1,2 @@
 // This file is auto-generated 
-export type ItemIDs = 'food-hotdog | lottery-ticket';
+export type ItemIDs = 'lottery-ticket | food-hotdog | gas-can';
