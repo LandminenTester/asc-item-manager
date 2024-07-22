@@ -96,6 +96,13 @@ export type BaseItem = {
     };
 
     /**
+     * The rotation of the item in the inventory
+     *
+     * @type {number}
+     */
+    rotation: number;
+
+    /**
      * The maximum amount of items that can exist in this stack of items
      *
      * @type {number}
