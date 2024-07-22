@@ -33,6 +33,14 @@ export type Storage = {
     id: string;
 
     /**
+     * The name of the storage
+     *
+     * @type {string}
+     *
+     */
+    name: string;
+
+    /**
      * The date in which the storage was last used
      *
      * @type {number}
@@ -207,6 +215,14 @@ export type Item = {
 } & BaseItem;
 
 export type AddOptions = {
+    /**
+     * The name of the storage
+     *
+     * @type {string}
+     *
+     */
+    name?: string;
+
     /**
      * The maximum weight an array of items can have
      *

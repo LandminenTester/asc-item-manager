@@ -27,6 +27,10 @@ const managerDb = useItemManagerDatabase();
 export async function useStorageItemManager(identifier: string, options: Omit<AddOptions, 'data'> = {}) {
     const itemArrayManager = useItemArrayManager();
 
+    if (!options.name) {
+        options.name = 'Storage ' + identifier;
+    }
+
     if (!options.maxCells) {
         options.maxCells = ItemManagerConfig.slots.maxCells;
     }
@@ -40,7 +44,7 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
     let document = await db.get<Storage>({ id: identifier }, ItemManagerConfig.collectionNameForStorage);
     if (!document) {
         await db.create<Omit<Storage, '_id'>>(
-            { id: identifier, items: [], maxCells: options.maxCells, lastAccessed: Date.now() },
+            { id: identifier, items: [], name: options.name, maxCells: options.maxCells, lastAccessed: Date.now() },
             ItemManagerConfig.collectionNameForStorage,
         );
 
@@ -167,6 +171,14 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
         }
 
         return Utility.clone.arrayData(document.items) ?? [];
+    }
+
+    /**
+     * Get the document for the storage
+     *
+     */
+    async function getDocument() {
+        return document;
     }
 
     /**
@@ -306,6 +318,7 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
         get,
         getByUid,
         getData,
+        getDocument,
         getErrorMessage() {
             return itemArrayManager.getErrorMessage();
         },
