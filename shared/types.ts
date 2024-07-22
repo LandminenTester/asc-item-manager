@@ -86,6 +86,16 @@ export type BaseItem = {
     height: number;
 
     /**
+     * The position of the item in the inventory
+     *
+     * @type {{x: number, y: number}}
+     */
+    position?: {
+        x: number;
+        y: number;
+    };
+
+    /**
      * The maximum amount of items that can exist in this stack of items
      *
      * @type {number}
