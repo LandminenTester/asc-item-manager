@@ -90,21 +90,24 @@ export function usePlayerItemManager(player: alt.Player) {
      * @param {number} quantity - The quantity of the item to remove.
      * @returns {Promise<boolean>} A promise that resolves to `true` if the item was removed successfully, otherwise `false`.
      */
-    async function remove(id: ItemIDs, quantity: number): Promise<boolean> {
+    async function remove(uid: string, quantity: number): Promise<boolean> {
         const data = document.get<InventoryExtension>();
         if (!data.items) {
             data.items = [];
         }
 
         const initialQuantity = quantity;
-        const items = itemArrayManager.remove(id, quantity, data.items);
+        const items = itemArrayManager.remove(uid, quantity, data.items);
         if (!items) {
             return false;
         }
 
         await document.set<InventoryExtension>('items', items);
 
-        invoker.invokeOnItemRemoved(player, id, initialQuantity);
+        const removedItem = data.items.find((item) => item.uid === uid);
+        if (removedItem) {
+            invoker.invokeOnItemRemoved(player, removedItem.id, initialQuantity);
+        }
         invoker.invokeOnItemsUpdated(player, items);
 
         return true;

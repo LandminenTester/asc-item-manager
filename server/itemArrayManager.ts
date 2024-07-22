@@ -157,31 +157,20 @@ export function useItemArrayManager() {
         return item ? (item.data as Readonly<T>) : undefined;
     }
 
-    function remove(id: ItemIDs, quantity: number, items: Item[]): Item[] | undefined {
+    function remove(uid: string, quantity: number, items: Item[]): Item[] | undefined {
         errorMessage = '';
-        if (!has(id, quantity, items)) {
+        const itemIndex = items.findIndex((item) => item.uid === uid);
+
+        if (itemIndex === -1 || items[itemIndex].quantity < quantity) {
             return undefined;
         }
 
         items = cloneItems(items);
-        for (let i = items.length - 1; i >= 0; i--) {
-            if (items[i].id !== id) {
-                continue;
-            }
 
-            if (quantity <= 0) {
-                break;
-            }
-
-            if (quantity >= items[i].quantity) {
-                quantity -= items[i].quantity;
-                items.splice(i, 1);
-                continue;
-            }
-
-            items[i].quantity -= quantity;
-            quantity = 0;
-            break;
+        if (quantity >= items[itemIndex].quantity) {
+            items.splice(itemIndex, 1);
+        } else {
+            items[itemIndex].quantity -= quantity;
         }
 
         return items;
