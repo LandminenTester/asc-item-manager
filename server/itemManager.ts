@@ -21,17 +21,7 @@ async function init() {
 
     let items = await db.getAll<DatabaseBaseItem>(ItemManagerConfig.collectionName);
     if (!items || items.length <= 0) {
-        await db.create<BaseItem>(
-            {
-                id: 'example',
-                name: 'Example Item',
-                desc: 'Basic Example Item',
-                maxStack: 16,
-                weight: 0.01,
-                icon: 'whatever.png',
-            },
-            ItemManagerConfig.collectionName,
-        );
+        console.log(`No Items found in database...`);
         items = await db.getAll<DatabaseBaseItem>(ItemManagerConfig.collectionName);
     }
 
