@@ -224,16 +224,22 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
      */
     async function stack(uidToStackOn: string, uidToStack: string) {
         const currentItems = await getInternal();
-        const items = itemArrayManager.stack(uidToStackOn, uidToStack, currentItems);
-        if (!items) {
-            return false;
+        const result = itemArrayManager.stack(uidToStackOn, uidToStack, currentItems);
+        if (!result.success) {
+            return {
+                success: false,
+                item: null,
+            };
         }
 
-        await updateItems(items);
+        await updateItems(result.items);
 
-        invoker.invokeOnItemsUpdated(identifier, items);
+        invoker.invokeOnItemsUpdated(identifier, result.items);
 
-        return true;
+        return {
+            success: true,
+            item: result.newItem,
+        };
     }
 
     /**
@@ -248,16 +254,24 @@ export async function useStorageItemManager(identifier: string, options: Omit<Ad
      */
     async function split(uid: string, amountToSplit: number, options: AddOptions = {}) {
         const currentItems = await getInternal();
-        const items = itemArrayManager.split(uid, amountToSplit, currentItems, options);
-        if (!items) {
-            return false;
+        const result = itemArrayManager.split(uid, amountToSplit, currentItems, options);
+        if (!result.success) {
+            return {
+                success: false,
+                oldItem: null,
+                newItem: null,
+            };
         }
 
-        await updateItems(items);
+        await updateItems(result.items);
 
-        invoker.invokeOnItemsUpdated(identifier, items);
+        invoker.invokeOnItemsUpdated(identifier, result.items);
 
-        return true;
+        return {
+            success: true,
+            oldItem: result.oldItem,
+            newItem: result.newItem,
+        };
     }
 
     /**

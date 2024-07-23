@@ -182,19 +182,28 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
     async function stack(uidToStackOn: string, uidToStack: string) {
         const data = document.get<InventoryExtension>();
         if (!data.items) {
-            return false;
+            return {
+                success: false,
+                item: null,
+            };
         }
 
-        const items = itemArrayManager.stack(uidToStackOn, uidToStack, data.items);
-        if (!items) {
-            return false;
+        const result = itemArrayManager.stack(uidToStackOn, uidToStack, data.items);
+        if (!result.success) {
+            return {
+                success: false,
+                item: null,
+            };
         }
 
-        await document.set<InventoryExtension>('items', items);
+        await document.set<InventoryExtension>('items', result.items);
 
-        invoker.invokeOnItemsUpdated(vehicle, items);
+        invoker.invokeOnItemsUpdated(vehicle, result.items);
 
-        return true;
+        return {
+            success: true,
+            item: result.newItem,
+        };
     }
 
     /**
@@ -210,19 +219,31 @@ export function useVehicleItemManager(vehicle: alt.Vehicle) {
     async function split(uid: string, amountToSplit: number, options: AddOptions = {}) {
         const data = document.get<InventoryExtension>();
         if (!data.items) {
-            return false;
+            return {
+                success: false,
+                oldItem: null,
+                newItem: null,
+            };
         }
 
-        const items = itemArrayManager.split(uid, amountToSplit, data.items, options);
-        if (!items) {
-            return false;
+        const result = itemArrayManager.split(uid, amountToSplit, data.items, options);
+        if (!result.success) {
+            return {
+                success: false,
+                oldItem: null,
+                newItem: null,
+            };
         }
 
-        await document.set<InventoryExtension>('items', items);
+        await document.set<InventoryExtension>('items', result.items);
 
-        invoker.invokeOnItemsUpdated(vehicle, items);
+        invoker.invokeOnItemsUpdated(vehicle, result.items);
 
-        return true;
+        return {
+            success: true,
+            oldItem: result.oldItem,
+            newItem: result.newItem,
+        };
     }
 
     /**
