@@ -19,13 +19,7 @@ const invoker = usePlayerItemManagerEventInvoker();
  * @param {alt.Player} player - The player whose item inventory is being managed.
  * @returns {Object} An object containing methods to manipulate the player's item inventory.
  */
-export function usePlayerItemManager(
-    player: alt.Player,
-    inventoryCells: { width: number; height: number } = {
-        width: ItemManagerConfig.slots.maxCells.width,
-        height: ItemManagerConfig.slots.maxCells.height,
-    },
-) {
+export function usePlayerItemManager(player: alt.Player, inventoryCells?: { width: number; height: number }) {
     const document = Rebar.document.character.useCharacter(player);
     const itemArrayManager = useItemArrayManager();
     const itemUsage = useItemUsageManager();
@@ -33,12 +27,12 @@ export function usePlayerItemManager(
     const data = document.get<InventoryExtension>();
     if (!data.inventoryCells) {
         document.set<InventoryExtension>('inventoryCells', {
-            width: inventoryCells.width,
-            height: inventoryCells.height,
+            width: ItemManagerConfig.slots.maxCells.width,
+            height: ItemManagerConfig.slots.maxCells.height,
         });
     }
 
-    if (data.inventoryCells !== inventoryCells) {
+    if (inventoryCells && data.inventoryCells !== inventoryCells) {
         document.set<InventoryExtension>('inventoryCells', {
             width: inventoryCells.width,
             height: inventoryCells.height,
