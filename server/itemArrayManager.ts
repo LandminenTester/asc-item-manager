@@ -70,6 +70,10 @@ export function useItemArrayManager() {
         quantity: number,
         options: AddOptions,
     ): Item[] | undefined {
+        if (baseItem.maxStack <= 1) {
+            return addNewItemStacks(items, baseItem, quantity, options);
+        }
+
         for (let i = 0; i < items.length; i++) {
             if (items[i].id !== baseItem.id || items[i].quantity === baseItem.maxStack) {
                 continue;
@@ -120,16 +124,9 @@ export function useItemArrayManager() {
         }
 
         items = cloneItems(items);
+
         if (baseItem.maxStack <= 1) {
-            const uid = Utility.uid.generate();
-            const newItem: Item = { ...baseItem, quantity, uid };
-
-            if (options.data) {
-                newItem.data = options.data;
-            }
-
-            items.push(newItem);
-            return verifyStackAndWeight(items, options) ? items : undefined;
+            return addNewItemStacks(items, baseItem as Item, quantity, options);
         }
 
         return handleItemStacking(items, baseItem as Item, quantity, options);
