@@ -1,2 +1,2 @@
 // This file is auto-generated 
-export type ItemIDs = 'food-hotdog';
+export type ItemIDs = 'example | food-hotdog | food-bull | food-water';

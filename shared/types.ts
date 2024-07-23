@@ -1,3 +1,9 @@
+declare module '@Shared/types/character.js' {
+    export interface Character {
+        inventoryCells: { width: number; height: number };
+    }
+}
+
 export type InventoryExtension = {
     /**
      * Items in the player's inventory

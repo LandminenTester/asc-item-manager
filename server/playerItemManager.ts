@@ -5,6 +5,7 @@ import { useItemArrayManager } from './itemArrayManager.js';
 import { ItemIDs } from '../shared/ignoreItemIds.js';
 import { usePlayerItemManagerEventInvoker } from './playerItemManagerEvents.js';
 import { useItemUsageManager } from './itemUsageManager.js';
+import { ItemManagerConfig } from '../shared/config.js';
 
 const Rebar = useRebar();
 
@@ -18,10 +19,31 @@ const invoker = usePlayerItemManagerEventInvoker();
  * @param {alt.Player} player - The player whose item inventory is being managed.
  * @returns {Object} An object containing methods to manipulate the player's item inventory.
  */
-export function usePlayerItemManager(player: alt.Player) {
+export function usePlayerItemManager(
+    player: alt.Player,
+    inventoryCells: { width: number; height: number } = {
+        width: ItemManagerConfig.slots.maxCells.width,
+        height: ItemManagerConfig.slots.maxCells.height,
+    },
+) {
     const document = Rebar.document.character.useCharacter(player);
     const itemArrayManager = useItemArrayManager();
     const itemUsage = useItemUsageManager();
+
+    const data = document.get<InventoryExtension>();
+    if (!data.inventoryCells) {
+        document.set<InventoryExtension>('inventoryCells', {
+            width: inventoryCells.width,
+            height: inventoryCells.height,
+        });
+    }
+
+    if (data.inventoryCells !== inventoryCells) {
+        document.set<InventoryExtension>('inventoryCells', {
+            width: inventoryCells.width,
+            height: inventoryCells.height,
+        });
+    }
 
     /**
      * Adds a similar item based on `id` or creates a new item and adds it to the player's inventory.
@@ -37,6 +59,10 @@ export function usePlayerItemManager(player: alt.Player) {
         const data = document.get<InventoryExtension>();
         if (!data.items) {
             data.items = [];
+        }
+
+        if (!addOptions.maxCells) {
+            addOptions.maxCells = data.inventoryCells;
         }
 
         const items = itemArrayManager.add(id, quantity, data.items, addOptions);
@@ -67,6 +93,10 @@ export function usePlayerItemManager(player: alt.Player) {
         const data = document.get<InventoryExtension>();
         if (!data.items) {
             data.items = [];
+        }
+
+        if (!addOptions.maxCells) {
+            addOptions.maxCells = data.inventoryCells;
         }
 
         const items = itemArrayManager.addSpecificItem(item, data.items, addOptions);
@@ -233,6 +263,10 @@ export function usePlayerItemManager(player: alt.Player) {
         const data = document.get<InventoryExtension>();
         if (!data.items) {
             return false;
+        }
+
+        if (!options.maxCells) {
+            options.maxCells = data.inventoryCells;
         }
 
         const items = itemArrayManager.split(uid, amountToSplit, data.items, options);

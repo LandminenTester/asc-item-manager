@@ -4,7 +4,7 @@ export const ItemManagerConfig = {
     // Determines how much weight a container can hold
     // This can be modified when calling functions
     weight: {
-        enabled: true,
+        enabled: false,
         maxWeight: 32,
     },
     // Determines how many item slots all containers have
@@ -13,7 +13,7 @@ export const ItemManagerConfig = {
         enabled: true,
         maxCells: {
             width: 5,
-            height: 5,
+            height: 20,
         },
     },
 };
