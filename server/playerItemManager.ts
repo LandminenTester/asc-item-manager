@@ -260,28 +260,40 @@ export function usePlayerItemManager(player: alt.Player, inventoryCells?: { widt
      * @param {string} uid - The UID of the item to split.
      * @param {number} amountToSplit - The amount to split from the item.
      * @param {AddOptions} [options={}] - Additional options for splitting the item.
-     * @returns {Promise<boolean>} A promise that resolves to `true` if the item was split successfully, otherwise `false`.
+     * @returns {Promise<{ success: boolean; oldItem: Item; newItem: Item }>} A promise that resolves to `true` if the item was split successfully, otherwise `false`.
      */
     async function split(uid: string, amountToSplit: number, options: AddOptions = {}) {
         const data = document.get<InventoryExtension>();
         if (!data.items) {
-            return false;
+            return {
+                success: false,
+                oldItem: null,
+                newItem: null,
+            };
         }
 
         if (!options.maxCells) {
             options.maxCells = data.inventoryCells;
         }
 
-        const items = itemArrayManager.split(uid, amountToSplit, data.items, options);
-        if (!items) {
-            return false;
+        const result = itemArrayManager.split(uid, amountToSplit, data.items, options);
+        if (!result.success) {
+            return {
+                success: false,
+                oldItem: null,
+                newItem: null,
+            };
         }
 
-        await document.set<InventoryExtension>('items', items);
+        await document.set<InventoryExtension>('items', result.items);
 
-        invoker.invokeOnItemsUpdated(player, items);
+        invoker.invokeOnItemsUpdated(player, result.items);
 
-        return true;
+        return {
+            success: true,
+            oldItem: result.oldItem,
+            newItem: result.newItem,
+        };
     }
 
     /**

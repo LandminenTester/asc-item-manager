@@ -231,24 +231,39 @@ export function useItemArrayManager() {
         amountToSplit: number,
         items: Item[],
         options: Omit<AddOptions, 'data'>,
-    ): Item[] | undefined {
+    ): { success: boolean; oldItem: Item; newItem: Item; items: Item[] } {
         errorMessage = '';
         items = cloneItems(items);
         const index = items.findIndex((x) => x.uid === uid);
         if (index <= -1) {
             setErrorMessage('Could not find given item in inventory during split');
-            return undefined;
+            return {
+                success: false,
+                oldItem: null,
+                newItem: null,
+                items: null,
+            };
         }
 
         const baseItem = itemManager.getBaseItem(items[index].id as ItemIDs);
         if (!baseItem) {
             setErrorMessage('Base item does not exist');
-            return undefined;
+            return {
+                success: false,
+                oldItem: null,
+                newItem: null,
+                items: null,
+            };
         }
 
         if (items[index].quantity < amountToSplit || items[index].quantity === amountToSplit) {
             setErrorMessage('Item cannot be split');
-            return undefined;
+            return {
+                success: false,
+                oldItem: null,
+                newItem: null,
+                items: null,
+            };
         }
 
         items[index].quantity -= amountToSplit;
@@ -256,7 +271,15 @@ export function useItemArrayManager() {
 
         const newItem = { ...clonedItem, quantity: amountToSplit, uid: Utility.uid.generate() };
         items.push(newItem);
-        return verifyStackAndWeight(items, options) ? items : undefined;
+
+        return verifyStackAndWeight(items, options)
+            ? {
+                  success: true,
+                  oldItem: items[index],
+                  newItem: newItem,
+                  items: items,
+              }
+            : undefined;
     }
 
     function stack(
@@ -264,13 +287,13 @@ export function useItemArrayManager() {
         uidToStack: string,
         items: Item[],
     ): { success: boolean; newItem: Item; items: Item[] } {
-        errorMessage = '';
+        let errorMessage = '';
         items = cloneItems(items);
         const stackableIndex = items.findIndex((x) => x.uid === uidToStackOn);
         const stackIndex = items.findIndex((x) => x.uid === uidToStack);
 
         if (stackIndex <= -1 || stackableIndex <= -1) {
-            setErrorMessage('Could not find both items in inventory');
+            errorMessage = 'Could not find both items in inventory';
             return {
                 success: false,
                 newItem: null,
@@ -279,7 +302,7 @@ export function useItemArrayManager() {
         }
 
         if (items[stackableIndex].id !== items[stackIndex].id) {
-            setErrorMessage('Both items were not the same, and cannot be stacked');
+            errorMessage = 'Both items were not the same, and cannot be stacked';
             return {
                 success: false,
                 newItem: null,
@@ -289,7 +312,17 @@ export function useItemArrayManager() {
 
         const baseItem = itemManager.getBaseItem(items[stackIndex].id as ItemIDs);
         if (!baseItem || baseItem.maxStack <= 1) {
-            setErrorMessage('Item cannot be stacked');
+            errorMessage = 'Item cannot be stacked';
+            return {
+                success: false,
+                newItem: null,
+                items: null,
+            };
+        }
+
+        const totalQuantity = items[stackableIndex].quantity + items[stackIndex].quantity;
+        if (totalQuantity > items[stackableIndex].maxStack) {
+            errorMessage = 'Total quantity exceeds max stack';
             return {
                 success: false,
                 newItem: null,
@@ -298,18 +331,10 @@ export function useItemArrayManager() {
         }
 
         const diffToMax = items[stackableIndex].maxStack - items[stackableIndex].quantity;
-        if (diffToMax <= 0) {
-            setErrorMessage('Item is already at max stack');
-            return {
-                success: false,
-                newItem: null,
-                items: null,
-            };
-        }
-
-        items[stackableIndex].quantity += diffToMax;
-        if (items[stackIndex].quantity > diffToMax) {
-            items[stackIndex].quantity -= diffToMax;
+        const amountToStack = Math.min(diffToMax, items[stackIndex].quantity);
+        items[stackableIndex].quantity += amountToStack;
+        if (items[stackIndex].quantity > amountToStack) {
+            items[stackIndex].quantity -= amountToStack;
         } else {
             items.splice(stackIndex, 1);
         }
