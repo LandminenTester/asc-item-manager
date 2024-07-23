@@ -224,24 +224,33 @@ export function usePlayerItemManager(player: alt.Player, inventoryCells?: { widt
      *
      * @param {string} uidToStackOn - The UID of the item to stack onto.
      * @param {string} uidToStack - The UID of the item to be stacked.
-     * @returns {Promise<boolean>} A promise that resolves to `true` if the items were stacked successfully, otherwise `false`.
+     * @returns {Promise<{success: boolean, item: Item}>} A promise that resolves to `true` if the items were stacked successfully, otherwise `false`.
      */
-    async function stack(uidToStackOn: string, uidToStack: string) {
+    async function stack(uidToStackOn: string, uidToStack: string): Promise<{ success: boolean; item: Item }> {
         const data = document.get<InventoryExtension>();
         if (!data.items) {
-            return false;
+            return {
+                success: false,
+                item: null,
+            };
         }
 
-        const items = itemArrayManager.stack(uidToStackOn, uidToStack, data.items);
-        if (!items) {
-            return false;
+        const result = itemArrayManager.stack(uidToStackOn, uidToStack, data.items);
+        if (!result.success) {
+            return {
+                success: false,
+                item: null,
+            };
         }
 
-        await document.set<InventoryExtension>('items', items);
+        await document.set<InventoryExtension>('items', result.items);
 
-        invoker.invokeOnItemsUpdated(player, items);
+        invoker.invokeOnItemsUpdated(player, result.items);
 
-        return true;
+        return {
+            success: true,
+            item: result.newItem,
+        };
     }
 
     /**

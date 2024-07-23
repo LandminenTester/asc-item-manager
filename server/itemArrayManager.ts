@@ -259,7 +259,11 @@ export function useItemArrayManager() {
         return verifyStackAndWeight(items, options) ? items : undefined;
     }
 
-    function stack(uidToStackOn: string, uidToStack: string, items: Item[]): Item[] | undefined {
+    function stack(
+        uidToStackOn: string,
+        uidToStack: string,
+        items: Item[],
+    ): { success: boolean; newItem: Item; items: Item[] } {
         errorMessage = '';
         items = cloneItems(items);
         const stackableIndex = items.findIndex((x) => x.uid === uidToStackOn);
@@ -267,24 +271,40 @@ export function useItemArrayManager() {
 
         if (stackIndex <= -1 || stackableIndex <= -1) {
             setErrorMessage('Could not find both items in inventory');
-            return undefined;
+            return {
+                success: false,
+                newItem: null,
+                items: null,
+            };
         }
 
         if (items[stackableIndex].id !== items[stackIndex].id) {
             setErrorMessage('Both items were not the same, and cannot be stacked');
-            return undefined;
+            return {
+                success: false,
+                newItem: null,
+                items: null,
+            };
         }
 
         const baseItem = itemManager.getBaseItem(items[stackIndex].id as ItemIDs);
         if (!baseItem || baseItem.maxStack <= 1) {
             setErrorMessage('Item cannot be stacked');
-            return undefined;
+            return {
+                success: false,
+                newItem: null,
+                items: null,
+            };
         }
 
         const diffToMax = items[stackableIndex].maxStack - items[stackableIndex].quantity;
         if (diffToMax <= 0) {
             setErrorMessage('Item is already at max stack');
-            return undefined;
+            return {
+                success: false,
+                newItem: null,
+                items: null,
+            };
         }
 
         items[stackableIndex].quantity += diffToMax;
@@ -294,7 +314,11 @@ export function useItemArrayManager() {
             items.splice(stackIndex, 1);
         }
 
-        return items;
+        return {
+            success: true,
+            newItem: items[stackableIndex],
+            items: items,
+        };
     }
 
     function update(uid: string, data: Partial<Omit<Item, '_id'>>, items: Item[]): Item[] | undefined {
