@@ -286,18 +286,18 @@ export function useItemArrayManager() {
         uidToStackOn: string,
         uidToStack: string,
         items: Item[],
-    ): { success: boolean; newItem: Item; items: Item[] } {
+    ): { success: boolean; newItem: Item | null; items: Item[]; errorMessage?: string } {
         let errorMessage = '';
         items = cloneItems(items);
-        const stackableIndex = items.findIndex((x) => x.uid === uidToStackOn);
+        let stackableIndex = items.findIndex((x) => x.uid === uidToStackOn);
         const stackIndex = items.findIndex((x) => x.uid === uidToStack);
 
-        if (stackIndex <= -1 || stackableIndex <= -1) {
+        if (stackIndex === -1 || stackableIndex === -1) {
             errorMessage = 'Could not find both items in inventory';
             return {
                 success: false,
                 newItem: null,
-                items: null,
+                items: items,
             };
         }
 
@@ -306,7 +306,8 @@ export function useItemArrayManager() {
             return {
                 success: false,
                 newItem: null,
-                items: null,
+                items: items,
+                errorMessage,
             };
         }
 
@@ -316,7 +317,7 @@ export function useItemArrayManager() {
             return {
                 success: false,
                 newItem: null,
-                items: null,
+                items: items,
             };
         }
 
@@ -326,17 +327,31 @@ export function useItemArrayManager() {
             return {
                 success: false,
                 newItem: null,
-                items: null,
+                items: items,
             };
         }
 
         const diffToMax = items[stackableIndex].maxStack - items[stackableIndex].quantity;
         const amountToStack = Math.min(diffToMax, items[stackIndex].quantity);
-        items[stackableIndex].quantity += amountToStack;
+
+        if (amountToStack === 0) {
+            errorMessage = 'No items can be stacked (max stack already reached)';
+            return {
+                success: false,
+                newItem: null,
+                items: items,
+            };
+        }
+
+        items[stackableIndex] = { ...items[stackableIndex], quantity: items[stackableIndex].quantity + amountToStack };
+
         if (items[stackIndex].quantity > amountToStack) {
-            items[stackIndex].quantity -= amountToStack;
+            items[stackIndex] = { ...items[stackIndex], quantity: items[stackIndex].quantity - amountToStack };
         } else {
             items.splice(stackIndex, 1);
+            if (stackIndex < stackableIndex) {
+                stackableIndex--;
+            }
         }
 
         return {
