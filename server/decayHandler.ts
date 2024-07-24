@@ -4,6 +4,7 @@ import { Storage } from '../shared/types.js';
 import { ItemManagerConfig } from '../shared/config.js';
 import { useStorageItemManager } from './storageItemManager.js';
 import { useVehicleItemManager } from './vehicleItemManager.js';
+import { usePlayerItemManager } from './playerItemManager.js';
 
 const Rebar = useRebar();
 const RebarEvents = Rebar.events.useEvents();
@@ -57,13 +58,13 @@ async function updateVehicles() {
 async function updatePlayers() {
     const promises: Promise<any>[] = [];
 
-    for (let vehicle of alt.Vehicle.all) {
-        if (!Rebar.document.vehicle.useVehicle(vehicle).get()) {
+    for (let player of alt.Player.all) {
+        if (!Rebar.document.character.useCharacter(player).get()) {
             continue;
         }
 
-        const vehicleManager = useVehicleItemManager(vehicle);
-        promises.push(vehicleManager.invokeDecay());
+        const playerManager = usePlayerItemManager(player);
+        promises.push(playerManager.invokeDecay());
     }
 
     await Promise.all(promises);
