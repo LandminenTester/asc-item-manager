@@ -75,6 +75,20 @@ export function useItemManager() {
             await db.create(clonedItem, ItemManagerConfig.collectionName);
             console.log('Item created:', item.id);
         }
+
+        databaseItems[item.id] = clonedItem as DatabaseBaseItem;
+
+        const ids = Object.keys(databaseItems);
+
+        try {
+            let fileContent = '// This file is auto-generated \r\n';
+            fileContent += `export type ItemIDs = '${ids.length >= 1 ? ids.join(' | ') : ''}';`;
+            fs.writeFileSync(ItemIdsFilePath, fileContent);
+        } catch (err) {
+            alt.logWarning(
+                `If you renamed the folder 'asc-item-manager' please rename the plugin back to its original name`,
+            );
+        }
     }
 
     /**
