@@ -3,7 +3,7 @@ import { Item } from '../shared/types.js';
 import { useItemManager } from './itemManager.js';
 import { ItemIDs } from '../shared/ignoreItemIds.js';
 
-type ItemUseCallback = (player: alt.Player, uid: string) => void;
+type ItemUseCallback = (player: alt.Player, item: Item) => void;
 
 const callbacks: { [id: string]: ItemUseCallback[] } = {};
 const itemManger = useItemManager();
@@ -40,7 +40,7 @@ export function useItemUsageManager() {
         }
 
         for (let cb of callbacks[baseItem.useEventName]) {
-            cb(player, item.uid);
+            cb(player, item);
         }
 
         return true;
